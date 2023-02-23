@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Smoothie {
+  id         Int      @id(map: "smoothies_pkey") @default(autoincrement()) @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  title      String
+  method     String
+  rating     Int      @db.SmallInt
+}
+
+model Greeting {
+  id         Int       @id @default(autoincrement()) @db.SmallInt
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  text       String?   @default("")
+}
