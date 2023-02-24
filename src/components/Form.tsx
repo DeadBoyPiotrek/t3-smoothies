@@ -40,6 +40,8 @@ export const Form = () => {
   return (
     <form
       noValidate
+      //TODO
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
       className="mb-4 w-[400px] rounded bg-white px-8 pt-6 pb-8 shadow-md"
     >
