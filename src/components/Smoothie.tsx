@@ -3,9 +3,9 @@ import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helpers";
 
 type SmoothieProps = Prisma.Smoothie;
-const deleteSmoothie = api.smoothies.deleteOne.useMutation({ useMutation });
 
 export const Smoothie = (smoothie: SmoothieProps) => {
+  const deleteSmoothie = api.smoothies.deleteOne.useMutation();
   const { title, created_at, method, rating, id } = smoothie;
   return (
     <div className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg">

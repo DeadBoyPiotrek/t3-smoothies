@@ -5,9 +5,13 @@ import { Smoothie } from "~/components/Smoothie";
 import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "hello" });
+  const hello = api.example.hello.useQuery({ text: "from tRPC" });
   const helloSupa = api.example.supGreeting.useQuery().data?.items[0]?.text;
-  const { data: smoothies } = api.smoothies.getAll.useQuery();
+  const {
+    data: smoothies,
+    isLoading,
+    isError,
+  } = api.smoothies.getAll.useQuery();
   console.log(`🚀 ~ smoothies:`, smoothies);
   return (
     <>
@@ -20,7 +24,8 @@ const Home: NextPage = () => {
         <h1 className="text-5xl">{hello?.data && hello.data.greeting}</h1>
         <h2 className="mt-5 text-2xl">{helloSupa}</h2>
       </div>
-
+      {isLoading && <p>Loading Smoothies...</p>}
+      {isError && <p>Error loading Smoothies... </p>}
       <div className="flex flex-wrap items-center justify-center gap-5">
         {smoothies ? (
           smoothies.map((smoothie) => (
