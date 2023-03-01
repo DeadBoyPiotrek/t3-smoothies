@@ -1,8 +1,9 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "~/utils/api";
 
-export const FormSchema = z.object({
+const FormSchema = z.object({
   title: z.string().min(5).max(150),
   method: z.string().min(5).max(5000),
   rating: z.number().min(1).max(10),
@@ -17,24 +18,24 @@ export const Form = () => {
     watch,
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-  const onSubmit: SubmitHandler<FormSchemaType> = async (data) => {
-    try {
-      const response = await fetch("/api/addSmoothie", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add smoothie");
-      }
-
-      console.log("Smoothie added successfully");
-    } catch (error) {
-      console.error(error);
-    }
+  const deleteSmoothie = api.smoothies.addOne.useMutation();
+  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    deleteSmoothie.mutate(data);
+    // try {
+    //   const response = await fetch("/api/addSmoothie", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(data),
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error("Failed to add smoothie");
+    //   }
+    //   console.log("Smoothie added successfully");
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   return (

@@ -17,8 +17,8 @@ export const smoothiesRouter = createTRPCRouter({
       await prisma.smoothie.delete({ where: { id } });
       return {};
     }),
-  addOne: publicProcedure.input(FormSchema).mutation(async (input) => {
-    await prisma.smoothie.create({
+  addOne: publicProcedure.input(FormSchema).mutation(async ({ ctx, input }) => {
+    await ctx.prisma.smoothie.create({
       data: input,
     });
     return {};

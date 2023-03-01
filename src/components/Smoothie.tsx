@@ -2,10 +2,16 @@ import type Prisma from "@prisma/client";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helpers";
 
-type SmoothieProps = Prisma.Smoothie;
+type SmoothieItem = Prisma.Smoothie;
+type OnRefetch = { onRefetch: () => void };
+type SmoothieProps = SmoothieItem & OnRefetch;
 
-export const Smoothie = (smoothie: SmoothieProps) => {
-  const deleteSmoothie = api.smoothies.deleteOne.useMutation();
+export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
+  const deleteSmoothie = api.smoothies.deleteOne.useMutation({
+    onSuccess: () => {
+      void onRefetch();
+    },
+  });
   const { title, created_at, method, rating, id } = smoothie;
   return (
     <div className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg">

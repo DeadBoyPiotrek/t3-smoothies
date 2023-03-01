@@ -11,8 +11,9 @@ const Home: NextPage = () => {
     data: smoothies,
     isLoading,
     isError,
+    refetch: refetchSmoothies,
   } = api.smoothies.getAll.useQuery();
-  console.log(`🚀 ~ smoothies:`, smoothies);
+
   return (
     <>
       <Head>
@@ -29,7 +30,11 @@ const Home: NextPage = () => {
       <div className="flex flex-wrap items-center justify-center gap-5">
         {smoothies ? (
           smoothies.map((smoothie) => (
-            <Smoothie key={smoothie.id} {...smoothie} />
+            <Smoothie
+              onRefetch={refetchSmoothies as () => void}
+              key={smoothie.id}
+              {...smoothie}
+            />
           ))
         ) : (
           <div>no smoothies found</div>
