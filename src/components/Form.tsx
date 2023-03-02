@@ -15,12 +15,12 @@ export const Form = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch,
+    // watch,
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-  const deleteSmoothie = api.smoothies.addOne.useMutation();
+  const addSmoothie = api.smoothies.addOne.useMutation();
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    deleteSmoothie.mutate(data);
+    addSmoothie.mutate(data);
   };
 
   return (
@@ -89,7 +89,7 @@ export const Form = () => {
           Submit
         </button>
       </div>
-      <pre className="p-1">{JSON.stringify(watch(), null, 2)}</pre>
+      {/* <pre className="p-1">{JSON.stringify(watch(), null, 2)}</pre> */}
     </form>
   );
 };

@@ -26,8 +26,13 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-  const updateSmoothie = api.smoothies.updateOne.useMutation();
+  const updateSmoothie = api.smoothies.updateOne.useMutation({
+    onSuccess: () => {
+      onRefetch();
+    },
+  });
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    console.log(`🚀 ~ Smoothie ~ data:`, data);
     updateSmoothie.mutate(data);
   };
 
@@ -69,10 +74,29 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
         </div>
       ) : (
         // form
-        <form className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg">
+        <form
+          noValidate
+          //TODO
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onSubmit={handleSubmit(onSubmit)}
+          // onBlur={void handleSubmit(onSubmit)}
+          className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
+        >
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-2xl font-semibold">
-              {<input {...register("title")} value={title} id=""></input>}
+              <input
+                defaultValue={title}
+                type="text"
+                id="title"
+                {...register("title")}
+                className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+                disabled={isSubmitting}
+              />
+              {errors.title && (
+                <p className="text-xs italic text-red-500">
+                  {errors.title.message}
+                </p>
+              )}
             </h2>
             <div className="flex">
               <button
@@ -82,9 +106,12 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
                 Delete
               </button>
               <button
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log("lol");
+
+                  console.log("lol2");
                   setEditing(false);
-                  handleSubmit(onSubmit);
                 }}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
@@ -94,20 +121,52 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
           </div>
           <div className="mb-3 text-gray-600">{formatDate(created_at)}</div>
           <p className="break-all text-lg">
-            {<input {...register("title")} placeholder={method} id=""></input>}
+            <textarea
+              defaultValue={method}
+              id="method"
+              {...register("method")}
+              className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+              disabled={isSubmitting}
+            />
+            {errors.method && (
+              <p className="text-xs italic text-red-500">
+                {errors.method.message}
+              </p>
+            )}
           </p>
           <div className="mt-3">
             <span className="text-gray-600">Rating: </span>
             <span className="text-lg font-semibold">
-              {
-                <input
-                  {...(register("rating"), { valueAsNumber: true })}
-                  value={`${rating}`}
-                  id=""
-                ></input>
-              }
+              <input
+                defaultValue={rating}
+                type="number"
+                id="rating"
+                min={1}
+                max={10}
+                {...register("rating", { valueAsNumber: true })}
+                className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+                disabled={isSubmitting}
+              />
+              {errors.rating && (
+                <p className="text-xs italic text-red-500">
+                  {errors.rating.message}
+                </p>
+              )}
             </span>
           </div>
+          <button
+            type="submit"
+            className="focus:shadow-outline rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700 focus:outline-none"
+            disabled={isSubmitting}
+          >
+            Submit
+          </button>
+          <input
+            type={"hidden"}
+            {...register("id", { valueAsNumber: true })}
+            defaultValue={id}
+            id="id"
+          />
         </form>
       )}
     </>
