@@ -21,21 +21,6 @@ export const Form = () => {
   const deleteSmoothie = api.smoothies.addOne.useMutation();
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     deleteSmoothie.mutate(data);
-    // try {
-    //   const response = await fetch("/api/addSmoothie", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error("Failed to add smoothie");
-    //   }
-    //   console.log("Smoothie added successfully");
-    // } catch (error) {
-    //   console.error(error);
-    // }
   };
 
   return (

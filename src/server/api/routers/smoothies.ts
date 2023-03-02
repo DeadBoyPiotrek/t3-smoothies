@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
-export const FormSchema = z.object({
+const FormSchema = z.object({
   title: z.string().min(5).max(150),
   method: z.string().min(5).max(5000),
   rating: z.number().min(1).max(10),
 });
+const FormSchemaEdit = FormSchema.extend({ id: z.number() });
 export const smoothiesRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
     const items = await prisma.smoothie.findMany();
@@ -23,4 +24,13 @@ export const smoothiesRouter = createTRPCRouter({
     });
     return {};
   }),
+  updateOne: publicProcedure
+    .input(FormSchemaEdit)
+    .mutation(async ({ ctx, input }) => {
+      const { id, ...inputNoId } = input;
+      await ctx.prisma.smoothie.update({
+        where: { id: input.id },
+        data: inputNoId,
+      });
+    }),
 });
