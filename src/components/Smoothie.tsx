@@ -24,17 +24,22 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
+  } = useForm<FormSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(FormSchema),
+  });
 
   const updateSmoothie = api.smoothies.updateOne.useMutation({
     onSuccess: () => {
       onRefetch();
     },
   });
-  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    console.log(`🚀 ~ Smoothie ~ data:`, data);
-    updateSmoothie.mutate(data);
-  };
+  // const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+  //   console.log(`🚀 ~ Smoothie ~ data:`, data);
+  //   setEditing(false);
+  //   updateSmoothie.mutate(data);
+  // };
+  const onSubmit = (data) => console.log(data);
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
     onSuccess: () => {
@@ -73,13 +78,14 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
           </div>
         </div>
       ) : (
-        // form
+        //! form
         <form
           noValidate
           //TODO
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onSubmit={handleSubmit(onSubmit)}
-          // onBlur={void handleSubmit(onSubmit)}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          // onBlur={handleSubmit(onSubmit)}
           className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
         >
           <div className="mb-5 flex items-center justify-between">
@@ -106,12 +112,9 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
                 Delete
               </button>
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  console.log("lol");
-
-                  console.log("lol2");
+                onClick={() => {
                   setEditing(false);
+                  handleSubmit(onSubmit);
                 }}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
@@ -154,13 +157,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
               )}
             </span>
           </div>
-          <button
-            type="submit"
-            className="focus:shadow-outline rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700 focus:outline-none"
-            disabled={isSubmitting}
-          >
-            Submit
-          </button>
+
           <input
             type={"hidden"}
             {...register("id", { valueAsNumber: true })}

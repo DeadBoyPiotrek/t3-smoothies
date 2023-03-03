@@ -9,7 +9,9 @@ const FormSchema = z.object({
 const FormSchemaEdit = FormSchema.extend({ id: z.number() });
 export const smoothiesRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    const items = await prisma.smoothie.findMany();
+    const items = await prisma.smoothie.findMany({
+      orderBy: { created_at: "desc" },
+    });
     return items;
   }),
   deleteOne: publicProcedure
