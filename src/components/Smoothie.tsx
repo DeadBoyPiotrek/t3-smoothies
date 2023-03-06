@@ -26,7 +26,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     formState: { errors, isSubmitting },
     getValues,
   } = useForm<FormSchemaType>({
-    mode: "onBlur",
     resolver: zodResolver(FormSchema),
   });
 
@@ -43,7 +42,8 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
        */
       function handleClickOutside(event) {
         if (ref.current && !ref.current.contains(event.target)) {
-          alert("You clicked outside of me!");
+          console.log("hello");
+          handleSubmit(onSubmit)();
         }
       }
       // Bind the event listener
@@ -56,10 +56,10 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   }
   const wrapperRef = useRef(null);
   useOutsideAlerter(wrapperRef);
-  const onSubmit: SubmitHandler<FormSchemaType> = (data, event) => {
-    //check if click happened inside form element
-    // if so don't do anything
-    // if user clicked outside of the form handle submit
+  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    console.log("onSUbmit");
+    updateSmoothie.mutate({ ...data });
+    setEditing(false);
   };
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
@@ -106,7 +106,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
           //TODO
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           // onSubmit={handleSubmit(onSubmit)}
-          onBlur={handleSubmit(onSubmit)}
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           // onBlur={handleSubmit(onSubmit)}
           className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
