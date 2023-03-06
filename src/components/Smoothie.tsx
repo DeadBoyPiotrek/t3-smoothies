@@ -1,5 +1,5 @@
 import type Prisma from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helpers";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -24,6 +24,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    getValues,
   } = useForm<FormSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(FormSchema),
@@ -34,12 +35,32 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
       onRefetch();
     },
   });
-  // const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-  //   console.log(`🚀 ~ Smoothie ~ data:`, data);
-  //   setEditing(false);
-  //   updateSmoothie.mutate(data);
-  // };
-  const onSubmit = (data) => console.log(data);
+
+  function useOutsideAlerter(ref) {
+    useEffect(() => {
+      /**
+       * Alert if clicked on outside of element
+       */
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          alert("You clicked outside of me!");
+        }
+      }
+      // Bind the event listener
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        // Unbind the event listener on clean up
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [ref]);
+  }
+  const wrapperRef = useRef(null);
+  useOutsideAlerter(wrapperRef);
+  const onSubmit: SubmitHandler<FormSchemaType> = (data, event) => {
+    //check if click happened inside form element
+    // if so don't do anything
+    // if user clicked outside of the form handle submit
+  };
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
     onSuccess: () => {
@@ -80,10 +101,12 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
       ) : (
         //! form
         <form
+          ref={wrapperRef}
           noValidate
           //TODO
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onSubmit={handleSubmit(onSubmit)}
+          // onSubmit={handleSubmit(onSubmit)}
+          onBlur={handleSubmit(onSubmit)}
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           // onBlur={handleSubmit(onSubmit)}
           className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
