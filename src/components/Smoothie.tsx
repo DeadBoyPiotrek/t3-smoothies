@@ -18,6 +18,22 @@ const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
 
 export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
+  //! textarea
+
+  const [val, setVal] = useState("svsd svsdsvsd svsdsvsd svsdsvsd svsd");
+  const textAreaRef = useRef(null);
+
+  const resizeTextArea = () => {
+    textAreaRef.current.style.height = "auto";
+    textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+  };
+
+  useEffect(resizeTextArea, [val]);
+
+  const onChange = (e) => {
+    setVal(e.target.value);
+  };
+  //! textarea
   const [editing, setEditing] = useState(false);
 
   const {
@@ -117,7 +133,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
                 type="text"
                 id="title"
                 {...register("title")}
-                className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+                className="focus:shadow-outline h-auto w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
                 disabled={isSubmitting}
               />
               {errors.title && (
@@ -147,10 +163,11 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
           <div className="mb-3 text-gray-600">{formatDate(created_at)}</div>
           <p className="break-all text-lg">
             <textarea
+              ref={textAreaRef}
               defaultValue={method}
               id="method"
               {...register("method")}
-              className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+              className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none "
               disabled={isSubmitting}
             />
             {errors.method && (
