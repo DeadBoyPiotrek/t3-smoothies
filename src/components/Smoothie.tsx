@@ -18,14 +18,29 @@ const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
 
 export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
-  //! textarea
+  const [editing, setEditing] = useState(false);
 
-  const [val, setVal] = useState("svsd svsdsvsd svsdsvsd svsdsvsd svsd");
-  const textAreaRef = useRef(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormSchemaType>({
+    resolver: zodResolver(FormSchema),
+  });
+  //! textarea
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  // console.log(`🚀 ~ Smoothie ~ textAreaRef:`, textAreaRef);
+
+  const [val, setVal] = useState("");
+  const { ref, ...rest } = register("method");
 
   const resizeTextArea = () => {
-    textAreaRef.current.style.height = "auto";
-    textAreaRef.current.style.height = textAreaRef.current.scrollHeight + "px";
+    console.log("in resize text area");
+    if (textAreaRef.current) {
+      console.log("resizing");
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
   };
 
   useEffect(resizeTextArea, [val]);
@@ -34,16 +49,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     setVal(e.target.value);
   };
   //! textarea
-  const [editing, setEditing] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    getValues,
-  } = useForm<FormSchemaType>({
-    resolver: zodResolver(FormSchema),
-  });
 
   const updateSmoothie = api.smoothies.updateOne.useMutation({
     onSuccess: () => {
@@ -71,9 +76,10 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     }, [ref]);
   }
   const wrapperRef = useRef(null);
+
   useOutsideAlerter(wrapperRef);
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    console.log("onSUbmit");
+    console.log("onSubmit");
     updateSmoothie.mutate({ ...data });
     setEditing(false);
   };
@@ -100,6 +106,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
               <button
                 onClick={() => {
                   setEditing(true);
+                  resizeTextArea();
                 }}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
@@ -162,14 +169,23 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
           </div>
           <div className="mb-3 text-gray-600">{formatDate(created_at)}</div>
           <p className="break-all text-lg">
+            {/* //! textarea -------------- */}
             <textarea
-              ref={textAreaRef}
               defaultValue={method}
               id="method"
-              {...register("method")}
+              {...register("method", {
+                onChange: (e) => {
+                  onChange(e);
+                },
+              })}
+              ref={(e) => {
+                ref(e);
+                textAreaRef.current = e;
+              }}
               className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none "
               disabled={isSubmitting}
             />
+            {/* //! textarea -------------- */}
             {errors.method && (
               <p className="text-xs italic text-red-500">
                 {errors.method.message}
