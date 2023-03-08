@@ -18,7 +18,15 @@ const FormSchema = z.object({
 export type FormSchemaType = z.infer<typeof FormSchema>;
 
 export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
-  const [editing, setEditing] = useState(false);
+  //TODO why the textAreaRef is null
+  const showForm = () => {
+    setEditing(true);
+    setTimeout(() => {
+      resizeTextArea();
+    }, 1);
+  };
+
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     register,
@@ -27,14 +35,13 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
   });
-  //! textarea
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
-  // console.log(`🚀 ~ Smoothie ~ textAreaRef:`, textAreaRef);
+  //! textarea -------------------------------------
 
   const [val, setVal] = useState("");
-  const { ref, ...rest } = register("method");
+  const { ref } = register("method");
 
   const resizeTextArea = () => {
+    console.log(`🚀 ~ Smoothie ~ textAreaRef:`, textAreaRef);
     console.log("in resize text area");
     if (textAreaRef.current) {
       console.log("resizing");
@@ -45,10 +52,11 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
 
   useEffect(resizeTextArea, [val]);
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVal(e.target.value);
   };
-  //! textarea
+  //! textarea -------------------------------------
+  const [editing, setEditing] = useState(false);
 
   const updateSmoothie = api.smoothies.updateOne.useMutation({
     onSuccess: () => {
@@ -56,21 +64,18 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
     },
   });
 
-  function useOutsideAlerter(ref) {
+  function useOutsideAlerter(ref: React.RefObject<HTMLElement>) {
     useEffect(() => {
-      /**
-       * Alert if clicked on outside of element
-       */
-      function handleClickOutside(event) {
-        if (ref.current && !ref.current.contains(event.target)) {
-          console.log("hello");
-          handleSubmit(onSubmit)();
+      function handleClickOutside(event: MouseEvent) {
+        console.log(`🚀 ~ handleClickOutside ~ event:`, event);
+
+        if (ref.current && !ref.current.contains(event.target as Node)) {
+          void handleSubmit(onSubmit)();
         }
       }
-      // Bind the event listener
+
       document.addEventListener("mousedown", handleClickOutside);
       return () => {
-        // Unbind the event listener on clean up
         document.removeEventListener("mousedown", handleClickOutside);
       };
     }, [ref]);
@@ -104,10 +109,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
                 Delete
               </button>
               <button
-                onClick={() => {
-                  setEditing(true);
-                  resizeTextArea();
-                }}
+                onClick={showForm}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
                 Edit
@@ -126,11 +128,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
         <form
           ref={wrapperRef}
           noValidate
-          //TODO
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          // onSubmit={handleSubmit(onSubmit)}
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          // onBlur={handleSubmit(onSubmit)}
           className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
         >
           <div className="mb-5 flex items-center justify-between">
@@ -159,7 +156,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
               <button
                 onClick={() => {
                   setEditing(false);
-                  handleSubmit(onSubmit);
+                  void handleSubmit(onSubmit)();
                 }}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
@@ -174,7 +171,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
               defaultValue={method}
               id="method"
               {...register("method", {
-                onChange: (e) => {
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                   onChange(e);
                 },
               })}
