@@ -5,6 +5,7 @@ import { formatDate } from "~/utils/helpers";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 type SmoothieItem = Prisma.Smoothie;
 type OnRefetch = { onRefetch: () => void };
 type SmoothieProps = SmoothieItem & OnRefetch;
@@ -41,10 +42,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   const { ref } = register("method");
 
   const resizeTextArea = () => {
-    console.log(`🚀 ~ Smoothie ~ textAreaRef:`, textAreaRef);
-    console.log("in resize text area");
     if (textAreaRef.current) {
-      console.log("resizing");
       textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
@@ -67,8 +65,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   function useOutsideAlerter(ref: React.RefObject<HTMLElement>) {
     useEffect(() => {
       function handleClickOutside(event: MouseEvent) {
-        console.log(`🚀 ~ handleClickOutside ~ event:`, event);
-
         if (ref.current && !ref.current.contains(event.target as Node)) {
           void handleSubmit(onSubmit)();
         }
@@ -84,13 +80,13 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
 
   useOutsideAlerter(wrapperRef);
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    console.log("onSubmit");
     updateSmoothie.mutate({ ...data });
     setEditing(false);
   };
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
     onSuccess: () => {
+      console.log("refetch on delete ");
       void onRefetch();
     },
   });
@@ -117,7 +113,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
             </div>
           </div>
           <div className="mb-3 text-gray-600">{formatDate(created_at)}</div>
-          <p className="break-all text-lg">{method}</p>
+          <p className="text-lg">{method}</p>
           <div className="mt-3">
             <span className="text-gray-600">Rating: </span>
             <span className="text-lg font-semibold">{rating}</span>
@@ -148,7 +144,10 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
             </h2>
             <div className="flex">
               <button
-                onClick={() => deleteSmoothie.mutate(id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  deleteSmoothie.mutate(id);
+                }}
                 className="mr-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
               >
                 Delete

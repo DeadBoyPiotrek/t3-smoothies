@@ -14,24 +14,45 @@ export const smoothiesRouter = createTRPCRouter({
     });
     return items;
   }),
+  getAllFiltered: publicProcedure
+    .input(z.string().max(150))
+    .query(async ({ input }) => {
+      const items = await prisma.smoothie.findMany({
+        where: { title: { contains: input } },
+        orderBy: { created_at: "desc" },
+      });
+      return items;
+    }),
   deleteOne: publicProcedure
     .input(z.number())
     .mutation(async ({ input: id }) => {
       await prisma.smoothie.delete({ where: { id } });
       return {};
     }),
+  deleteAll: publicProcedure.mutation(async () => {
+    await prisma.smoothie.deleteMany();
+    return {};
+  }),
   addOne: publicProcedure.input(FormSchema).mutation(async ({ ctx, input }) => {
     await ctx.prisma.smoothie.create({
       data: input,
     });
     return {};
   }),
+  addMany: publicProcedure
+    .input(FormSchema.array())
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.smoothie.createMany({
+        data: input,
+      });
+      return {};
+    }),
   updateOne: publicProcedure
     .input(FormSchemaEdit)
     .mutation(async ({ ctx, input }) => {
       const { id, ...inputNoId } = input;
       await ctx.prisma.smoothie.update({
-        where: { id: input.id },
+        where: { id },
         data: inputNoId,
       });
     }),

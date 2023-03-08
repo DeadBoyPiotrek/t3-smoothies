@@ -7,7 +7,20 @@ export const formatDate = (dateString: Date): string => {
   });
 };
 
-export function textAreaAdjust(element) {
-  element.style.height = "1px";
-  element.style.height = 25 + element.scrollHeight + "px";
-}
+import { useEffect, useState } from "react";
+
+export const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
