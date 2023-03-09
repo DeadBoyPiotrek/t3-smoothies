@@ -8,7 +8,6 @@ import { api } from "~/utils/api";
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
   const debouncedFilterValue = useDebounce(filter, 300);
-
   const {
     data: smoothiesFiltered,
     isLoading: isLoadingFiltered,
@@ -37,9 +36,6 @@ const Home: NextPage = () => {
       {/* {isLoadingFiltered && <p>Loading Smoothies...</p>}
       {isErrorFiltered && <p>Error loading Smoothies... </p>} */}
       <div className=" flex flex-wrap items-center justify-center gap-5 pt-28">
-        {/* <button onClick={void refetchSmoothiesFiltered} className="btn">
-          refetch filtered
-        </button> */}
         {smoothiesFiltered ? (
           smoothiesFiltered.map((smoothie) => (
             <Smoothie

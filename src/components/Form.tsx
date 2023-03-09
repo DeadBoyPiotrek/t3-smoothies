@@ -2,7 +2,6 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/utils/api";
-import { useEffect } from "react";
 
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
@@ -13,6 +12,7 @@ export type FormSchemaType = z.infer<typeof FormSchema>;
 
 export const Form = () => {
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -22,6 +22,7 @@ export const Form = () => {
   const addSmoothie = api.smoothies.addOne.useMutation();
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     addSmoothie.mutate(data);
+    reset();
   };
 
   return (

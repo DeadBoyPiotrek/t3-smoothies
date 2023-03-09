@@ -79,6 +79,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   const wrapperRef = useRef(null);
 
   useOutsideAlerter(wrapperRef);
+
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     updateSmoothie.mutate({ ...data });
     setEditing(false);
@@ -86,7 +87,6 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
     onSuccess: () => {
-      console.log("refetch on delete ");
       void onRefetch();
     },
   });
@@ -99,16 +99,16 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
             <h2 className="text-2xl font-semibold">{title}</h2>
             <div className="flex">
               <button
-                onClick={() => deleteSmoothie.mutate(id)}
-                className="mr-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
-              >
-                Delete
-              </button>
-              <button
                 onClick={showForm}
                 className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
                 Edit
+              </button>
+              <button
+                // onClick={() => deleteSmoothie.mutate(id)}
+                className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
+              >
+                Delete
               </button>
             </div>
           </div>
@@ -122,6 +122,9 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
       ) : (
         //! form
         <form
+          //TODO
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onSubmit={handleSubmit(onSubmit)}
           ref={wrapperRef}
           noValidate
           className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
@@ -144,22 +147,19 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
             </h2>
             <div className="flex">
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  deleteSmoothie.mutate(id);
-                }}
-                className="mr-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
+                type="submit"
+                className="ml-2 rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
               >
-                Delete
+                Submit
               </button>
               <button
-                onClick={() => {
-                  setEditing(false);
-                  void handleSubmit(onSubmit)();
-                }}
-                className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 hover:bg-gray-300"
+                // onClick={(e) => {
+                //   e.preventDefault();
+                //   deleteSmoothie.mutate(id);
+                // }}
+                className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
               >
-                Edit
+                Delete
               </button>
             </div>
           </div>
