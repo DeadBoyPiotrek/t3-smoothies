@@ -10,8 +10,8 @@ const Home: NextPage = () => {
   const debouncedFilterValue = useDebounce(filter, 300);
   const {
     data: smoothiesFiltered,
-    isLoading: isLoadingFiltered,
-    isError: isErrorFiltered,
+    // isLoading: isLoadingFiltered,
+    // isError: isErrorFiltered,
     refetch: refetchSmoothiesFiltered,
   } = api.smoothies.getAllFiltered.useQuery(debouncedFilterValue);
 

@@ -21,7 +21,8 @@ export const Form = () => {
 
   const addSmoothie = api.smoothies.addOne.useMutation();
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    addSmoothie.mutate(data);
+    //deploy
+    // addSmoothie.mutate(data);
     reset();
   };
 
