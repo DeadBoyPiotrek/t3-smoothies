@@ -7,16 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Smoothie {
-  id         Int      @id(map: "smoothies_pkey") @default(autoincrement()) @db.SmallInt
+model greetings {
+  id         Int       @id(map: "Greeting_pkey") @default(autoincrement()) @db.SmallInt
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  text       String?   @default("")
+}
+
+model smoothies {
+  id         Int      @id @default(autoincrement()) @db.SmallInt
   created_at DateTime @default(now()) @db.Timestamptz(6)
   title      String
   method     String
   rating     Int      @db.SmallInt
-}
-
-model Greeting {
-  id         Int       @id @default(autoincrement()) @db.SmallInt
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  text       String?   @default("")
 }

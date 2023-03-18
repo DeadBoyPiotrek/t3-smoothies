@@ -8,12 +8,8 @@ import { api } from "~/utils/api";
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
   const debouncedFilterValue = useDebounce(filter, 300);
-  const {
-    data: smoothiesFiltered,
-    // isLoading: isLoadingFiltered,
-    // isError: isErrorFiltered,
-    refetch: refetchSmoothiesFiltered,
-  } = api.smoothies.getAllFiltered.useQuery(debouncedFilterValue);
+  const { data: smoothiesFiltered, refetch: refetchSmoothiesFiltered } =
+    api.smoothies.getAllFiltered.useQuery(debouncedFilterValue);
 
   return (
     <>
@@ -33,8 +29,6 @@ const Home: NextPage = () => {
         />
       </div>
 
-      {/* {isLoadingFiltered && <p>Loading Smoothies...</p>}
-      {isErrorFiltered && <p>Error loading Smoothies... </p>} */}
       <div className=" flex flex-wrap items-center justify-center gap-5 pt-28">
         {smoothiesFiltered ? (
           smoothiesFiltered.map((smoothie) => (

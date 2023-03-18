@@ -12,7 +12,7 @@ import { formatDate } from "~/utils/helpers";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 export type FormSchemaType = z.infer<typeof FormSchema>;
-type SmoothieItem = Prisma.Smoothie;
+type SmoothieItem = Prisma.smoothies;
 type OnRefetch = { onRefetch: () => void };
 type HandleEditing = { handleEditing: () => void };
 type SmoothieProps = SmoothieItem & OnRefetch & HandleEditing;

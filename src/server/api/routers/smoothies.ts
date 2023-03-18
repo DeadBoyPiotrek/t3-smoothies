@@ -9,7 +9,7 @@ const FormSchema = z.object({
 const FormSchemaEdit = FormSchema.extend({ id: z.number() });
 export const smoothiesRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    const items = await prisma.smoothie.findMany({
+    const items = await prisma.smoothies.findMany({
       orderBy: { created_at: "desc" },
     });
     return items;
@@ -17,7 +17,7 @@ export const smoothiesRouter = createTRPCRouter({
   getAllFiltered: publicProcedure
     .input(z.string().max(150))
     .query(async ({ input }) => {
-      const items = await prisma.smoothie.findMany({
+      const items = await prisma.smoothies.findMany({
         where: { title: { contains: input, mode: "insensitive" } },
         orderBy: { id: "desc" },
       });
@@ -26,15 +26,15 @@ export const smoothiesRouter = createTRPCRouter({
   deleteOne: publicProcedure
     .input(z.number())
     .mutation(async ({ input: id }) => {
-      await prisma.smoothie.delete({ where: { id } });
+      await prisma.smoothies.delete({ where: { id } });
       // return {};
     }),
   deleteAll: publicProcedure.mutation(async () => {
-    await prisma.smoothie.deleteMany();
+    await prisma.smoothies.deleteMany();
     // return {};
   }),
   addOne: publicProcedure.input(FormSchema).mutation(async ({ ctx, input }) => {
-    await ctx.prisma.smoothie.create({
+    await ctx.prisma.smoothies.create({
       data: input,
     });
     // return {};
@@ -42,7 +42,7 @@ export const smoothiesRouter = createTRPCRouter({
   addMany: publicProcedure
     .input(FormSchema.array())
     .mutation(async ({ ctx, input }) => {
-      await ctx.prisma.smoothie.createMany({
+      await ctx.prisma.smoothies.createMany({
         data: input,
       });
       // return {};
@@ -51,7 +51,7 @@ export const smoothiesRouter = createTRPCRouter({
     .input(FormSchemaEdit)
     .mutation(async ({ ctx, input }) => {
       const { id, ...inputNoId } = input;
-      await ctx.prisma.smoothie.update({
+      await ctx.prisma.smoothies.update({
         where: { id },
         data: inputNoId,
       });
