@@ -9,8 +9,8 @@ datasource db {
 
 model greetings {
   id         Int       @id(map: "Greeting_pkey") @default(autoincrement()) @db.SmallInt
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-  text       String?   @default("")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  text       String   @default("")
 }
 
 model smoothies {

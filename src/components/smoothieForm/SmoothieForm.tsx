@@ -73,7 +73,7 @@ export const SmoothieForm = ({
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    // updateSmoothie.mutate({ ...data });
+    updateSmoothie.mutate({ ...data });
     handleEditing();
   };
 
@@ -119,7 +119,7 @@ export const SmoothieForm = ({
             onClick={(e) => {
               e.preventDefault();
               //deploy
-              //   deleteSmoothie.mutate(id);
+              deleteSmoothie.mutate(id);
             }}
             className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
           >

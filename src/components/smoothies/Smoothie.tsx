@@ -3,13 +3,16 @@ import { useState } from "react";
 import { api } from "~/utils/api";
 
 import { formatDate } from "~/utils/helpers";
-import { SmoothieForm } from "./SmoothieForm";
+import { SmoothieForm } from "../smoothieForm/SmoothieForm";
 
-type SmoothieItem = Prisma.Smoothie;
-type OnRefetch = { onRefetch: () => void };
-type SmoothieProps = SmoothieItem & OnRefetch;
+type SmoothieProps = Prisma.smoothies;
 
-export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
+export const Smoothie = ({
+  onRefetch,
+  smoothie,
+}: {
+  smoothie: SmoothieProps;
+}) => {
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
     onSuccess: () => {
       void onRefetch();
@@ -26,7 +29,7 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
   return (
     <>
       {!editing ? (
-        <div className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg">
+        <div className="mb-5 w-full max-w-lg rounded-lg bg-neutral-50 p-5 shadow-lg">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-2xl font-semibold">{title}</h2>
             <div className="flex">
@@ -38,8 +41,8 @@ export const Smoothie = ({ onRefetch, ...smoothie }: SmoothieProps) => {
               </button>
               <button
                 //deploy
-                // onClick={() => deleteSmoothie.mutate(id)}
-                className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
+                onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
+                className="ml-2 rounded-lg bg-red px-3 py-2 font-semibold text-white hover:bg-red-300"
               >
                 Delete
               </button>

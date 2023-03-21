@@ -1,43 +1,36 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { prisma } from "~/server/db";
-const FormSchema = z.object({
-  title: z.string().min(5).max(150),
-  method: z.string().min(5).max(5000),
-  rating: z.number().min(1).max(10),
-});
-const FormSchemaEdit = FormSchema.extend({ id: z.number() });
+import { FormSchema } from "./smoothieSchema";
+const FormSchemaWithId = FormSchema.extend({ id: z.number() });
 export const smoothiesRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
-    const items = await prisma.smoothies.findMany({
+    return await prisma.smoothies.findMany({
       orderBy: { created_at: "desc" },
     });
-    return items;
   }),
   getAllFiltered: publicProcedure
-    .input(z.string().max(150))
+    .input(z.object({ smoothieTitle: z.string().max(150) }))
     .query(async ({ input }) => {
-      const items = await prisma.smoothies.findMany({
-        where: { title: { contains: input, mode: "insensitive" } },
+      return await prisma.smoothies.findMany({
+        where: {
+          title: { contains: input.smoothieTitle, mode: "insensitive" },
+        },
         orderBy: { id: "desc" },
       });
-      return items;
     }),
   deleteOne: publicProcedure
-    .input(z.number())
-    .mutation(async ({ input: id }) => {
-      await prisma.smoothies.delete({ where: { id } });
-      // return {};
+    .input(z.object({ smoothieId: z.number() }))
+    .mutation(async ({ input }) => {
+      await prisma.smoothies.delete({ where: { id: input.smoothieId } });
     }),
   deleteAll: publicProcedure.mutation(async () => {
     await prisma.smoothies.deleteMany();
-    // return {};
   }),
   addOne: publicProcedure.input(FormSchema).mutation(async ({ ctx, input }) => {
     await ctx.prisma.smoothies.create({
       data: input,
     });
-    // return {};
   }),
   addMany: publicProcedure
     .input(FormSchema.array())
@@ -45,10 +38,9 @@ export const smoothiesRouter = createTRPCRouter({
       await ctx.prisma.smoothies.createMany({
         data: input,
       });
-      // return {};
     }),
   updateOne: publicProcedure
-    .input(FormSchemaEdit)
+    .input(FormSchemaWithId)
     .mutation(async ({ ctx, input }) => {
       const { id, ...inputNoId } = input;
       await ctx.prisma.smoothies.update({

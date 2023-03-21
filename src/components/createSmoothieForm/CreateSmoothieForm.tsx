@@ -10,19 +10,18 @@ const FormSchema = z.object({
 });
 export type FormSchemaType = z.infer<typeof FormSchema>;
 
-export const Form = () => {
+export const CreateSmoothieForm = () => {
   const {
     reset,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    // watch,
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
   const addSmoothie = api.smoothies.addOne.useMutation();
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    // addSmoothie.mutate(data);
+    addSmoothie.mutate(data);
     reset();
   };
 
@@ -79,20 +78,19 @@ export const Form = () => {
           disabled={isSubmitting}
         />
         {errors.rating && (
-          <p className="text-xs italic text-red-500">{errors.rating.message}</p>
+          <p className="text-xs italic text-red">{errors.rating.message}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between">
         <button
           type="submit"
-          className="focus:shadow-outline rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700 focus:outline-none"
+          className="focus:shadow-outline rounded bg-blue py-2 px-4 font-bold text-white hover:bg-blue-dark focus:outline-none"
           disabled={isSubmitting}
         >
           Submit
         </button>
       </div>
-      {/* <pre className="p-1">{JSON.stringify(watch(), null, 2)}</pre> */}
     </form>
   );
 };
