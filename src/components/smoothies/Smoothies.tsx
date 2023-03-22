@@ -1,5 +1,5 @@
 import type Prisma from "@prisma/client";
-import { Smoothie } from "~/components/smoothies/Smoothie";
+import { Smoothie } from "~/components/smoothies/smoothie/Smoothie";
 type SmoothieProps = Prisma.smoothies;
 export const Smoothies = ({
   smoothiesFiltered,
@@ -7,7 +7,7 @@ export const Smoothies = ({
   smoothiesFiltered: SmoothieProps[];
 }) => {
   return (
-    <div className=" flex flex-wrap items-center justify-center gap-5 pt-28">
+    <div className=" flex w-full flex-wrap items-center justify-center gap-5 pt-28">
       {smoothiesFiltered ? (
         smoothiesFiltered.map((smoothie) => (
           <Smoothie key={smoothie.id} smoothie={smoothie} />

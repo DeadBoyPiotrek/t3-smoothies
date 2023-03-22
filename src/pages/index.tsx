@@ -2,8 +2,10 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import { useDebounce } from "~/hooks/useDebounce";
+
 import { api } from "~/utils/api";
 import { Smoothies } from "~/components/smoothies/Smoothies";
+import { SearchSmoothieInput } from "~/components/smoothies/SearchSmoothieInput";
 
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
@@ -20,16 +22,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="w-full pt-32 text-center">
-        <input
-          onChange={(e) => {
-            setFilter(e.target.value);
-          }}
-          placeholder="Search Smoothie"
-          className="input font-bold"
-        />
+      <div className="flex w-full flex-col items-center  pt-32">
+        <SearchSmoothieInput setFilter={setFilter} />
+        {smoothiesFiltered && (
+          <Smoothies smoothiesFiltered={smoothiesFiltered} />
+        )}
       </div>
-      {smoothiesFiltered && <Smoothies smoothiesFiltered={smoothiesFiltered} />}
     </>
   );
 };

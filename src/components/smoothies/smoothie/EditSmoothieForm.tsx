@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import type Prisma from "@prisma/client";
@@ -12,11 +14,16 @@ import { api } from "~/utils/api";
 import { formatDate } from "~/utils/dates/formatDate";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FormInputError } from "~/components/errors/FormInputError";
 export type FormSchemaType = z.infer<typeof FormSchema>;
 type SmoothieItem = Prisma.smoothies;
-type HandleEditing = { handleEditing: () => void };
-type SmoothieProps = SmoothieItem & HandleEditing;
-export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
+
+interface SmoothieProps {
+  setEditing: Dispatch<SetStateAction<boolean>>;
+  smoothie: SmoothieItem;
+}
+
+export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
   const queryClient = useQueryClient();
   const { created_at, id } = smoothie;
   const defaultValues = smoothie;
@@ -31,7 +38,7 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
     defaultValues,
   });
   const [val, setVal] = useState("");
-  const { ref } = register("method");
+  const { ref: methodRef } = register("method");
 
   const resizeTextArea = () => {
     if (textAreaRef.current) {
@@ -72,8 +79,8 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    updateSmoothie.mutate({ ...data });
-    handleEditing();
+    // updateSmoothie.mutate(data);
+    setEditing(false);
   };
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
@@ -92,7 +99,7 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
       className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg"
     >
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">
+        <div className="text-2xl font-semibold">
           <input
             type="text"
             id="title"
@@ -100,12 +107,10 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
             className="focus:shadow-outline h-auto w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
             disabled={isSubmitting}
           />
-          {errors.title && (
-            <p className="text-xs italic text-red-500">
-              {errors.title.message}
-            </p>
+          {errors.title?.message && (
+            <FormInputError errorMessage={errors.title.message} />
           )}
-        </h2>
+        </div>
         <div className="flex">
           <button
             type="submit"
@@ -117,7 +122,7 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
             onClick={(e) => {
               e.preventDefault();
               //deploy
-              deleteSmoothie.mutate({ smoothieId: id });
+              // deleteSmoothie.mutate({ smoothieId: id });
             }}
             className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
           >
@@ -135,15 +140,15 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
             },
           })}
           ref={(e) => {
-            ref(e);
+            methodRef(e);
             textAreaRef.current = e;
           }}
           className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none "
           disabled={isSubmitting}
         />
 
-        {errors.method && (
-          <p className="text-xs italic text-red-500">{errors.method.message}</p>
+        {errors.method?.message && (
+          <FormInputError errorMessage={errors.method.message} />
         )}
       </p>
       <div className="mt-3">
@@ -158,10 +163,8 @@ export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
             className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
             disabled={isSubmitting}
           />
-          {errors.rating && (
-            <p className="text-xs italic text-red-500">
-              {errors.rating.message}
-            </p>
+          {errors.rating?.message && (
+            <FormInputError errorMessage={errors.rating.message} />
           )}
         </span>
       </div>

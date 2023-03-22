@@ -2,6 +2,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/utils/api";
+import { FormInputError } from "../errors/FormInputError";
 
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
@@ -22,7 +23,7 @@ export const CreateSmoothieForm = () => {
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    addSmoothie.mutate(data);
+    // addSmoothie.mutate(data);
     reset();
   };
 
@@ -45,8 +46,8 @@ export const CreateSmoothieForm = () => {
           className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
           disabled={isSubmitting}
         />
-        {errors.title && (
-          <p className="text-xs italic text-red-500">{errors.title.message}</p>
+        {errors.title?.message && (
+          <FormInputError errorMessage={errors.title.message} />
         )}
       </div>
 
@@ -60,8 +61,8 @@ export const CreateSmoothieForm = () => {
           className="focus:shadow-outline h-52 w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
           disabled={isSubmitting}
         />
-        {errors.method && (
-          <p className="text-xs italic text-red-500">{errors.method.message}</p>
+        {errors.method?.message && (
+          <FormInputError errorMessage={errors.method.message} />
         )}
       </div>
 
@@ -78,8 +79,8 @@ export const CreateSmoothieForm = () => {
           className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
           disabled={isSubmitting}
         />
-        {errors.rating && (
-          <p className="text-xs italic text-red">{errors.rating.message}</p>
+        {errors.rating?.message && (
+          <FormInputError errorMessage={errors.rating.message} />
         )}
       </div>
 
