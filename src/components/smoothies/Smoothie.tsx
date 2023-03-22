@@ -1,21 +1,17 @@
 import type Prisma from "@prisma/client";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { formatDate } from "~/utils/dates/formatDate";
+import { SmoothieForm } from "../editSmoothieForm/editSmoothieForm";
 import { api } from "~/utils/api";
-
-import { formatDate } from "~/utils/helpers";
-import { SmoothieForm } from "../smoothieForm/SmoothieForm";
-
 type SmoothieProps = Prisma.smoothies;
 
-export const Smoothie = ({
-  onRefetch,
-  smoothie,
-}: {
-  smoothie: SmoothieProps;
-}) => {
+export const Smoothie = ({ smoothie }: { smoothie: SmoothieProps }) => {
+  const queryClient = useQueryClient();
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
-    onSuccess: () => {
-      void onRefetch();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
     },
   });
   const [editing, setEditing] = useState(false);
@@ -56,11 +52,7 @@ export const Smoothie = ({
           </div>
         </div>
       ) : (
-        <SmoothieForm
-          handleEditing={handleEditing}
-          onRefetch={onRefetch}
-          {...smoothie}
-        />
+        <SmoothieForm handleEditing={handleEditing} {...smoothie} />
       )}
     </>
   );

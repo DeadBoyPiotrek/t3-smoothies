@@ -19,6 +19,7 @@ export const CreateSmoothieForm = () => {
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
   const addSmoothie = api.smoothies.addOne.useMutation();
+
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
     addSmoothie.mutate(data);
@@ -31,7 +32,7 @@ export const CreateSmoothieForm = () => {
       //TODO
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
-      className="mb-4 w-[400px] rounded bg-white px-8 pt-6 pb-8 shadow-md"
+      className="mb-4 w-full max-w-md rounded bg-white px-8 pt-6 pb-8 shadow-md"
     >
       <div className="mb-4">
         <label htmlFor="title" className="mb-2 block font-bold text-gray-700">
@@ -56,7 +57,7 @@ export const CreateSmoothieForm = () => {
         <textarea
           id="method"
           {...register("method")}
-          className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+          className="focus:shadow-outline h-52 w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
           disabled={isSubmitting}
         />
         {errors.method && (
@@ -64,7 +65,7 @@ export const CreateSmoothieForm = () => {
         )}
       </div>
 
-      <div className="mb-6">
+      <div className="mb-8">
         <label htmlFor="rating" className="mb-2 block font-bold text-gray-700">
           Rating:
         </label>
@@ -82,15 +83,13 @@ export const CreateSmoothieForm = () => {
         )}
       </div>
 
-      <div className="flex items-center justify-between">
-        <button
-          type="submit"
-          className="focus:shadow-outline rounded bg-blue py-2 px-4 font-bold text-white hover:bg-blue-dark focus:outline-none"
-          disabled={isSubmitting}
-        >
-          Submit
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="focus:shadow-outline rounded bg-red py-2 px-4 font-bold text-white hover:bg-red-500 focus:outline-none"
+        disabled={isSubmitting}
+      >
+        Submit
+      </button>
     </form>
   );
 };

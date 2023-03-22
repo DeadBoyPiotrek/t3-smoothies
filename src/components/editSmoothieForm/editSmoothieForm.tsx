@@ -1,6 +1,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
 import type Prisma from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
   method: z.string().min(5).max(5000),
@@ -8,20 +9,17 @@ const FormSchema = z.object({
   id: z.number(),
 });
 import { api } from "~/utils/api";
-import { formatDate } from "~/utils/helpers";
+import { formatDate } from "~/utils/dates/formatDate";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 export type FormSchemaType = z.infer<typeof FormSchema>;
 type SmoothieItem = Prisma.smoothies;
-type OnRefetch = { onRefetch: () => void };
 type HandleEditing = { handleEditing: () => void };
-type SmoothieProps = SmoothieItem & OnRefetch & HandleEditing;
-export const SmoothieForm = ({
-  onRefetch,
-  handleEditing,
-  ...smoothie
-}: SmoothieProps) => {
-  const { title, created_at, method, rating, id } = smoothie;
+type SmoothieProps = SmoothieItem & HandleEditing;
+export const SmoothieForm = ({ handleEditing, ...smoothie }: SmoothieProps) => {
+  const queryClient = useQueryClient();
+  const { created_at, id } = smoothie;
+  const defaultValues = smoothie;
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
@@ -30,6 +28,7 @@ export const SmoothieForm = ({
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({
     resolver: zodResolver(FormSchema),
+    defaultValues,
   });
   const [val, setVal] = useState("");
   const { ref } = register("method");
@@ -48,8 +47,8 @@ export const SmoothieForm = ({
   };
 
   const updateSmoothie = api.smoothies.updateOne.useMutation({
-    onSuccess: () => {
-      onRefetch();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
     },
   });
 
@@ -78,8 +77,8 @@ export const SmoothieForm = ({
   };
 
   const deleteSmoothie = api.smoothies.deleteOne.useMutation({
-    onSuccess: () => {
-      void onRefetch();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries();
     },
   });
 
@@ -95,7 +94,6 @@ export const SmoothieForm = ({
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-2xl font-semibold">
           <input
-            defaultValue={title}
             type="text"
             id="title"
             {...register("title")}
@@ -119,7 +117,7 @@ export const SmoothieForm = ({
             onClick={(e) => {
               e.preventDefault();
               //deploy
-              deleteSmoothie.mutate(id);
+              deleteSmoothie.mutate({ smoothieId: id });
             }}
             className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
           >
@@ -130,7 +128,6 @@ export const SmoothieForm = ({
       <div className="mb-3 text-gray-600">{formatDate(created_at)}</div>
       <p className="break-all text-lg">
         <textarea
-          defaultValue={method}
           id="method"
           {...register("method", {
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,7 +150,6 @@ export const SmoothieForm = ({
         <span className="text-gray-600">Rating: </span>
         <span className="text-lg font-semibold">
           <input
-            defaultValue={rating}
             type="number"
             id="rating"
             min={1}
@@ -173,7 +169,6 @@ export const SmoothieForm = ({
       <input
         type={"hidden"}
         {...register("id", { valueAsNumber: true })}
-        defaultValue={id}
         id="id"
       />
     </form>

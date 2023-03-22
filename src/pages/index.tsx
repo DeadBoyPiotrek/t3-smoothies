@@ -1,17 +1,16 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
-import { useDebounce } from "~/utils/helpers";
+import { useDebounce } from "~/hooks/useDebounce";
 import { api } from "~/utils/api";
 import { Smoothies } from "~/components/smoothies/Smoothies";
 
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
   const debouncedFilterValue = useDebounce(filter, 300);
-  const { data: smoothiesFiltered, refetch: refetchSmoothiesFiltered } =
-    api.smoothies.getAllFiltered.useQuery({
-      smoothieTitle: debouncedFilterValue,
-    });
+  const { data: smoothiesFiltered } = api.smoothies.getAllFiltered.useQuery({
+    smoothieTitle: debouncedFilterValue,
+  });
 
   return (
     <>
@@ -30,12 +29,7 @@ const Home: NextPage = () => {
           className="input font-bold"
         />
       </div>
-      {smoothiesFiltered && (
-        <Smoothies
-          smoothiesFiltered={smoothiesFiltered}
-          onRefetch={refetchSmoothiesFiltered}
-        />
-      )}
+      {smoothiesFiltered && <Smoothies smoothiesFiltered={smoothiesFiltered} />}
     </>
   );
 };
