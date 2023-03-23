@@ -53,7 +53,7 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
     setVal(e.target.value);
   };
 
-  const updateSmoothie = api.smoothies.updateOne.useMutation({
+  const updateSmoothie = api.smoothies.updateOneSmoothie.useMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries();
     },
@@ -79,20 +79,22 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    // updateSmoothie.mutate(data);
+    updateSmoothie.mutate(data);
     setEditing(false);
   };
 
-  const deleteSmoothie = api.smoothies.deleteOne.useMutation({
+  const deleteSmoothie = api.smoothies.deleteOneSmoothie.useMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries();
+      alert(`success`);
+    },
+    onError: async (error) => {
+      alert(`error deleting smoothie ${error}`);
     },
   });
 
   return (
     <form
-      //TODO
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
       ref={wrapperRef}
       noValidate
@@ -122,7 +124,7 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
             onClick={(e) => {
               e.preventDefault();
               //deploy
-              // deleteSmoothie.mutate({ smoothieId: id });
+              deleteSmoothie.mutate({ smoothieId: id });
             }}
             className="ml-2 rounded-lg bg-red-400 px-3 py-2 font-semibold text-white hover:bg-red-300"
           >

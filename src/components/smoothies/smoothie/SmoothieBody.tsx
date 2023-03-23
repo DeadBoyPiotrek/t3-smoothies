@@ -12,9 +12,12 @@ export const SmoothieBody = ({
   setEditing: Dispatch<SetStateAction<boolean>>;
 }) => {
   const queryClient = useQueryClient();
-  const deleteSmoothie = api.smoothies.deleteOne.useMutation({
+  const deleteSmoothie = api.smoothies.deleteOneSmoothie.useMutation({
     onSuccess: async () => {
       await queryClient.invalidateQueries();
+    },
+    onError: async (error) => {
+      alert(`error deleting smoothie ${error}`);
     },
   });
   const { title, created_at, id, method, rating } = smoothie;
@@ -33,7 +36,7 @@ export const SmoothieBody = ({
           </button>
           <button
             //deploy
-            // onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
+            onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
             className="ml-2 rounded-lg bg-red px-3 py-2 font-semibold text-white hover:bg-red-300"
           >
             Delete

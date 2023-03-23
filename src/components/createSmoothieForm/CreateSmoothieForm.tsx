@@ -19,19 +19,18 @@ export const CreateSmoothieForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-  const addSmoothie = api.smoothies.addOne.useMutation();
+  const addSmoothie = api.smoothies.addOneSmoothie.useMutation();
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-    // addSmoothie.mutate(data);
+
+    addSmoothie.mutate(data);
     reset();
   };
 
   return (
     <form
       noValidate
-      //TODO
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
       className="mb-4 w-full max-w-md rounded bg-white px-8 pt-6 pb-8 shadow-md"
     >

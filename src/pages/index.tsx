@@ -10,9 +10,10 @@ import { SearchSmoothieInput } from "~/components/smoothies/SearchSmoothieInput"
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
   const debouncedFilterValue = useDebounce(filter, 300);
-  const { data: smoothiesFiltered } = api.smoothies.getAllFiltered.useQuery({
-    smoothieTitle: debouncedFilterValue,
-  });
+  const { data: smoothiesFiltered } =
+    api.smoothies.getAllFilteredSmoothies.useQuery({
+      smoothieTitle: debouncedFilterValue,
+    });
 
   return (
     <>
