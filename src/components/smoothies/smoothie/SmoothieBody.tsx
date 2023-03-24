@@ -34,8 +34,8 @@ export const SmoothieBody = ({
           </button>
           <button
             //deploy
-            // onClick={deleteSingleSmoothie(id)}
-            onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
+
+            // onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
             className="ml-2 rounded-lg bg-red px-3 py-2 font-semibold text-white hover:bg-red-300"
           >
             Delete
