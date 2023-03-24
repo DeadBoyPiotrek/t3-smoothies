@@ -3,6 +3,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/utils/api";
 import { FormInputError } from "../errors/FormInputError";
+import { toast } from "react-toastify";
 
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
@@ -19,11 +20,12 @@ export const CreateSmoothieForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormSchemaType>({ resolver: zodResolver(FormSchema) });
 
-  const addSmoothie = api.smoothies.addOneSmoothie.useMutation();
+  const addSmoothie = api.smoothies.addOneSmoothie.useMutation({
+    onError: () => toast.error("error creating smoothie"),
+  });
 
   const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
     //deploy
-
     addSmoothie.mutate(data);
     reset();
   };
@@ -31,6 +33,7 @@ export const CreateSmoothieForm = () => {
   return (
     <form
       noValidate
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
       className="mb-4 w-full max-w-md rounded bg-white px-8 pt-6 pb-8 shadow-md"
     >

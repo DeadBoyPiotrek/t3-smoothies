@@ -1,9 +1,11 @@
-import type Prisma from "@prisma/client";
+import type { smoothies } from "@prisma/client";
 import { formatDate } from "~/utils/dates/formatDate";
 import { api } from "~/utils/api";
 import type { Dispatch, SetStateAction } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-type SmoothieProps = Prisma.smoothies;
+import { toast } from "react-toastify";
+
+type SmoothieProps = smoothies;
 export const SmoothieBody = ({
   smoothie,
   setEditing,
@@ -13,16 +15,12 @@ export const SmoothieBody = ({
 }) => {
   const queryClient = useQueryClient();
   const deleteSmoothie = api.smoothies.deleteOneSmoothie.useMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries();
-    },
-    onError: async (error) => {
-      alert(`error deleting smoothie ${error}`);
-    },
+    onSuccess: async () => await queryClient.invalidateQueries(),
+    onError: () => toast.error("Error deleting smoothie"),
   });
   const { title, created_at, id, method, rating } = smoothie;
   return (
-    <div className="mb-5 w-full max-w-lg rounded-lg bg-neutral-50 p-5 shadow-lg">
+    <div className="mb-5 w-full max-w-lg rounded-lg bg-white p-5 shadow-lg">
       <div className="mb-5 flex items-center justify-between">
         <h2 className="text-2xl font-semibold">{title}</h2>
         <div className="flex">
@@ -36,6 +34,7 @@ export const SmoothieBody = ({
           </button>
           <button
             //deploy
+            // onClick={deleteSingleSmoothie(id)}
             onClick={() => deleteSmoothie.mutate({ smoothieId: id })}
             className="ml-2 rounded-lg bg-red px-3 py-2 font-semibold text-white hover:bg-red-300"
           >

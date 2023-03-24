@@ -22,12 +22,7 @@ export const smoothiesRouter = createTRPCRouter({
   deleteOneSmoothie: publicProcedure
     .input(z.object({ smoothieId: z.number() }))
     .mutation(async ({ input }) => {
-      try {
-        throw Error("error connecting to database");
-        await prisma.smoothies.delete({ where: { id: input.smoothieId } });
-      } catch (error) {
-        throw error;
-      }
+      await prisma.smoothies.delete({ where: { id: input.smoothieId } });
     }),
   deleteAllSmoothies: publicProcedure.mutation(async () => {
     await prisma.smoothies.deleteMany();

@@ -1,22 +1,23 @@
 import type { Dispatch, SetStateAction } from "react";
-
+import type Prisma from "@prisma/client";
+type FormSchemaType = z.infer<typeof FormSchema>;
+type SmoothieItem = Prisma.smoothies;
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
-import type Prisma from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { api } from "~/utils/api";
+import { formatDate } from "~/utils/dates/formatDate";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FormInputError } from "~/components/errors/FormInputError";
+import { toast } from "react-toastify";
+import { useOutsideAlerter } from "~/hooks/useOutsideAlerter";
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
   method: z.string().min(5).max(5000),
   rating: z.number().min(1).max(10),
   id: z.number(),
 });
-import { api } from "~/utils/api";
-import { formatDate } from "~/utils/dates/formatDate";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormInputError } from "~/components/errors/FormInputError";
-export type FormSchemaType = z.infer<typeof FormSchema>;
-type SmoothieItem = Prisma.smoothies;
 
 interface SmoothieProps {
   setEditing: Dispatch<SetStateAction<boolean>>;
@@ -25,9 +26,17 @@ interface SmoothieProps {
 
 export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
   const queryClient = useQueryClient();
+  const updateSmoothie = api.smoothies.updateOneSmoothie.useMutation({
+    onSuccess: async () => await queryClient.invalidateQueries(),
+    onError: () => toast.error("Error updating smoothie"),
+  });
+  const deleteSmoothie = api.smoothies.deleteOneSmoothie.useMutation({
+    onSuccess: async () => await queryClient.invalidateQueries(),
+    onError: () => toast.error("Error deleting smoothie"),
+  });
+
   const { created_at, id } = smoothie;
   const defaultValues = smoothie;
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     register,
@@ -37,9 +46,15 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
-  const [val, setVal] = useState("");
-  const { ref: methodRef } = register("method");
+  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
+    //deploy
+    updateSmoothie.mutate(data);
+    setEditing(false);
+  };
 
+  const [val, setVal] = useState("");
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const { ref: methodRef } = register("method");
   const resizeTextArea = () => {
     if (textAreaRef.current) {
       textAreaRef.current.style.height = "auto";
@@ -53,48 +68,14 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
     setVal(e.target.value);
   };
 
-  const updateSmoothie = api.smoothies.updateOneSmoothie.useMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries();
-    },
-  });
-
-  function useOutsideAlerter(ref: React.RefObject<HTMLElement>) {
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (ref.current && !ref.current.contains(event.target as Node)) {
-          void handleSubmit(onSubmit)();
-        }
-      }
-
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, [ref]);
-  }
   const wrapperRef = useRef(null);
 
-  useOutsideAlerter(wrapperRef);
-
-  const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
-    //deploy
-    updateSmoothie.mutate(data);
-    setEditing(false);
-  };
-
-  const deleteSmoothie = api.smoothies.deleteOneSmoothie.useMutation({
-    onSuccess: async () => {
-      await queryClient.invalidateQueries();
-      alert(`success`);
-    },
-    onError: async (error) => {
-      alert(`error deleting smoothie ${error}`);
-    },
-  });
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  useOutsideAlerter(wrapperRef, handleSubmit(onSubmit));
 
   return (
     <form
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       onSubmit={handleSubmit(onSubmit)}
       ref={wrapperRef}
       noValidate
