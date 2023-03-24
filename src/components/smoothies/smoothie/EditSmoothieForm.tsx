@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInputError } from "~/components/errors/FormInputError";
 import { toast } from "react-toastify";
-import { useOutsideAlerter } from "~/hooks/useOutsideAlerter";
+
 const FormSchema = z.object({
   title: z.string().min(5).max(150),
   method: z.string().min(5).max(5000),
@@ -55,23 +55,17 @@ export const EditSmoothieForm = ({ setEditing, smoothie }: SmoothieProps) => {
   const [val, setVal] = useState("");
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const { ref: methodRef } = register("method");
-  const resizeTextArea = () => {
+
+  useEffect(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
-  };
-
-  useEffect(resizeTextArea, [val]);
-
+  }, [val]);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVal(e.target.value);
   };
 
   const wrapperRef = useRef(null);
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  useOutsideAlerter(wrapperRef, handleSubmit(onSubmit));
 
   return (
     <form
