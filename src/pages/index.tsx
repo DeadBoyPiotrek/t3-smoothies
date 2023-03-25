@@ -10,10 +10,9 @@ import { SearchSmoothieInput } from "~/components/smoothies/SearchSmoothieInput"
 const Home: NextPage = () => {
   const [filter, setFilter] = useState("");
   const debouncedFilterValue = useDebounce(filter, 300);
-  const { data: smoothiesFiltered } =
-    api.smoothies.getAllFilteredSmoothies.useQuery({
-      smoothieTitle: debouncedFilterValue,
-    });
+  const { data, isLoading } = api.smoothies.getAllFilteredSmoothies.useQuery({
+    smoothieTitle: debouncedFilterValue,
+  });
 
   return (
     <>
@@ -25,9 +24,7 @@ const Home: NextPage = () => {
 
       <div className="flex w-full flex-col items-center  pt-32">
         <SearchSmoothieInput setFilter={setFilter} />
-        {smoothiesFiltered && (
-          <Smoothies smoothiesFiltered={smoothiesFiltered} />
-        )}
+        <Smoothies loading={isLoading} smoothiesFiltered={data} />
       </div>
     </>
   );
